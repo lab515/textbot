@@ -184,7 +184,18 @@ public class FileUtils {
             }
         }
         if(is != null)return is;
-
+        try {
+            is = FileUtils.class.getClassLoader().getResourceAsStream("config/" + fileName);
+        } catch (Exception e) {
+            is = null;
+        }
+        if(is != null)return is;
+        try {
+            is = FileUtils.class.getClassLoader().getResourceAsStream("resources/" + fileName);
+        } catch (Exception e) {
+            is = null;
+        }
+        if(is != null)return is;
         // try to load from current dir/config/
         File file = new File(".");
         String basePath = "";

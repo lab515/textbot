@@ -35,6 +35,7 @@ public abstract class SomeBot implements Driver {
 
     private Map<String,String> macs;
     private TextBot tbot = null;
+    private boolean opened = true;
     private static class TextBotHolder{
         public TextBot tb = null;
         public String id = null;
@@ -129,13 +130,6 @@ public abstract class SomeBot implements Driver {
 
     private String getPageUrl(String url) throws Exception{
         // first of all, get the rooter
-        String data = currentUrl;
-        if(data == null || data.length() < 1 || data.startsWith("/"))data = macs.get("root");
-        else {
-
-            data = macs.get("root") + data; // root might be empty, doesn't matter
-        }
-
         if(url == null || url.length() < 1){
             url = currentUrl;
             if(url == null || url.length() < 1)url = macs.get("root");
@@ -166,12 +160,19 @@ public abstract class SomeBot implements Driver {
     protected abstract String check(String target, String op)throws Exception;
     protected abstract String url(boolean urlOrTitle)throws Exception; // get url or title
     protected abstract void timeout(int ms)throws Exception;
+    protected abstract void close() throws Exception;
 
     @Override
     public String executeCommand(String command, String target, String data, String page, String lastRet) throws Exception{
         log("Command: " + command + ", page: " + page + ", target: " + target + ",data: " + (data != null ? (data.length() > 10 ? data.substring(0,7) + "..." : data) : "n/a"));
-        // ADF managed browser, no shutdown or close will be valid
-        if(command.equals("close") || command.equals("shutdown"))throw new Exception("close or shutdown is not supported in ADF mode!");
+        if(command.equals("close") || command.equals("shutdown")){
+            close();
+            opened = false;
+            return "true";
+        }else if(!opened && !command.equals("open")){
+            open(getPageUrl(null));
+            opened = true;
+        }
         String ret = "";
         int order = 0;
 

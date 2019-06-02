@@ -1956,7 +1956,7 @@ public class TextBot extends Evaluator {
                     }catch (Exception e){
                         throw new Exception(getError("Error: " + e.getMessage() + " at "
                                         + cxt.actionPage + "." + cxt.actionName,
-                                code));
+                                code),e);
                     }finally{
                         if(pos == TB_INVOKE)paras.clear();
                     }
