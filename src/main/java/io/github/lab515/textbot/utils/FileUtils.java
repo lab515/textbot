@@ -86,7 +86,7 @@ public class FileUtils {
      * read a file from web
      *
      * @param Url
-     * @return
+     * @return a binary data from that resource
      */
     public static byte[] getWebFile(String Url) {
         InputStream is = null;

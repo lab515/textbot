@@ -7,30 +7,16 @@ import java.util.*;
 
 /**
  * This is the hierachy profile settings, which support syntax as below
- * profile.PROFILE_NAME=BASE_PROFILE_NAME
- * property@PROFILE_NAME.PROP_NAME=PROP_VALUE property.PROP_NAME=PROP_VALUE
- * property support +!- operators, + means overwirite as always, ! means
- * overwrite when it exists in base profile, - means remove if exist e,g
- * profile@newprofile.+propname=myvalue add new function: as below profile.xxx =
- * xxxx property@xxx.xxx = xxx alias.xxx = xxx|xxx|xxx, to make things simpler,
- * alias doesn't not allowed in the hierachy profile calculation!
- * newly redesigned since 2019
- * profile.a=b            ==> @a=b
- * property@a.c = 12      ==> @a.c = 12
- * property@a { c = 12}   ==> @a{c= 12}
- * mapping@a.b = c        ==> @a.b=$c$
- * variable@a.b= $12$     ==> @a.b=$12$
- * alias.a=b+c            ==> @a=b+c (so it's unified, still allow it)
- * added: removing a prop ==> @a{-c,b,c}
- * escaper ^ remains the same
- * @author mpeng
+ * \@{} defines a scope, which can be inherited from othe scope with name (profile name)
+ *
+ * @author yang peng
  */
 public class Profiles {
     /**
      * expose the property handler interface for external integration
      */
     static class PropertyEvaluator extends Evaluator {
-        private static LinkedHashMap<String, String> apiResults = new LinkedHashMap<>();
+        private static LinkedHashMap<String, String> apiResults = new LinkedHashMap<String, String>();
         public boolean resolveMode = false;
 
         private String checkResult(String key, String val){
@@ -374,7 +360,7 @@ public class Profiles {
         }
 
         // ADD: deferred processing, include removing
-        LinkedList<String> allList = new LinkedList<>();
+        LinkedList<String> allList = new LinkedList<String>();
         for(Object s : p1.keySet()){
             key = (String)s;
             if(key.startsWith("-")){
@@ -495,7 +481,7 @@ public class Profiles {
         String prefix = mapServer.length() > 0 ? "@" + mapServer : null;
         String key = null;
         String val = null;
-        LinkedList<String> allVars = new LinkedList<>();
+        LinkedList<String> allVars = new LinkedList<String>();
         int cnt = 0;
         for (Object o : conf.keySet()) {
             key = (String)o;

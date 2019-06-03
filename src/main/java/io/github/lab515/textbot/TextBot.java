@@ -378,7 +378,7 @@ public class TextBot extends Evaluator {
             if(cacheData != null && cacheData.containsKey(fromName)) {
                 data = cacheData.get(fromName);
                 return data == null ? "{" + fromName + "}" : null;
-            }else if(cacheData == null)cacheData = new LinkedHashMap<>();
+            }else if(cacheData == null)cacheData = new LinkedHashMap<String,String>();
             cacheData.put(fromName,null); // preset
         }
         String[] arr = ("-" + data + "-").split("\\$");

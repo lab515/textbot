@@ -45,7 +45,7 @@ public abstract class SomeBot implements Driver {
         }
         public boolean qualify(String id){return id == null || id.equals(this.id);}
     }
-    private static ThreadLocal<TextBotHolder> theBot = new ThreadLocal<>();
+    private static ThreadLocal<TextBotHolder> theBot = new ThreadLocal<TextBotHolder>();
 
 
 

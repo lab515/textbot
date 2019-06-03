@@ -6,10 +6,61 @@
   <packaging>jar</packaging>
   <version>1.0.0</version>
   <name>textbot</name>
-  <url>http://maven.apache.org</url><properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-  </properties>
+  <description>test automation interpretor layer</description>
+  <url>https://github.com/lab515/textbot</url>
+  
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Yang Peng</name>
+      <email>easywooods@hotmail.com</email>
+      <organization>xeedon</organization>
+      <organizationUrl>http://www.xeedon.com</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git://github.com/lab515/textbot.git</connection>
+    <developerConnection>scm:git:ssh://github.com:lab515/textbot.git</developerConnection>
+    <url>http://github.com/lab515/textbot/tree/master</url>
+   </scm>
+  
+  <build>
+	  <plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+				  <execution>
+					<id>attach-sources</id>
+					<phase>verify</phase>
+					<goals>
+					  <goal>jar-no-fork</goal>
+					</goals>
+				  </execution>
+				</executions>
+			  </plugin>
+	  </plugins>
+  </build>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
