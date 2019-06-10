@@ -1854,7 +1854,8 @@ public class TextBot extends Evaluator {
                     cxt.codePos = cxt.codeEnd;
                     break;
                 case TB_ASSERT:
-                    if(code.target == null || code.target.length() < 1 || getExprBoolean(code.target,code, null)) {
+                    //FIX: if assert; or assert : text, a "last" operator will be used
+                    if(getExprBoolean(code.target == null || code.target.length() < 1 ? "last" : code.target ,code, null)) {
                         val = "true";
                     }else{
                         throw new Exception(getError("Error: assert failure: " + (data != null ? data : "no info"),code));
