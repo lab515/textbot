@@ -395,10 +395,11 @@ public abstract class SomeBot implements Driver {
         log("Invoke: " + name + ", page: " + page + ", parameters: " + paras.size() + ",target: " + target);
         // format for parameter list, name= foramt
         String[] ps = new String[(paras != null ? paras.size() : 0) + 1]; // lastRet is ignored here!!
-        ps[0] = page + "." + target; // target
+        ps[0] = page + "." + (target == null ? "" : target); // target
         if(ps.length > 1) {
             int i = 1;
             for (String s : paras.keySet()) {
+                if(s.startsWith("!"))continue;
                 ps[i++] = s + "=" + paras.get(s);
             }
         }
