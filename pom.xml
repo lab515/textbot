@@ -4,7 +4,7 @@
   <groupId>io.github.lab515</groupId>
   <artifactId>textbot</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.0</version>
+  <version>1.0.3</version>
   <name>textbot</name>
   <description>test automation interpretor layer</description>
   <url>https://github.com/lab515/textbot</url>
@@ -36,6 +36,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.1.0</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
