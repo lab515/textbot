@@ -1711,11 +1711,11 @@ public class TextBot extends Evaluator {
   }
 
   public String execute(String src, Map<String, String> startArgs,
-                        Bot bot) throws Exception {
+                        Bot exBot) throws Exception {
     if (src == null || src.length() < 1) throw new Exception("Error: nothing to execute!");
     if (botCodes == null) throw new Exception("Error: textbot not initialized!");
-    if (bot == null) bot = this.bot;
-    if (bot == null) throw new Exception("Error: no bot specified, please specify a valid bot for execution!");
+    if (exBot == null) exBot = bot;
+    if (exBot == null) throw new Exception("Error: no bot specified, please specify a valid bot for execution!");
 
     List<String> instLines = parseInLines(src);
     if (instLines.size() < 1) {
@@ -1821,7 +1821,7 @@ public class TextBot extends Evaluator {
           if (val == null) val = "";
           paras.put(key, val);
         }
-        bot.setMetaVars(paras); // do not couting on it
+        exBot.setMetaVars(paras); // do not couting on it
         paras.clear();
 
       }
@@ -1979,10 +1979,10 @@ public class TextBot extends Evaluator {
           }
           try {
             if (!cxt.currentPage.equals(lastPage))
-              bot.navigating(lastPage, cxt.currentPage, getData((String) metaInfos.get("?" + cxt.currentPage),
+              exBot.navigating(lastPage, cxt.currentPage, getData((String) metaInfos.get("?" + cxt.currentPage),
                       code, null, null), code.command);
-            if (pos == TB_INVOKE) val = bot.invokeAction(code.command, paras, val, cxt.currentPage, cxt.lastRet);
-            else val = bot.executeCommand(code.command, val, data, cxt.currentPage, cxt.lastRet);
+            if (pos == TB_INVOKE) val = exBot.invokeAction(code.command, paras, val, cxt.currentPage, cxt.lastRet);
+            else val = exBot.executeCommand(code.command, val, data, cxt.currentPage, cxt.lastRet);
           } catch (Exception e) {
             throw new Exception(getError("Error: " + e.getMessage() + " at "
                             + cxt.actionPage + "." + cxt.actionName,
@@ -2053,9 +2053,9 @@ public class TextBot extends Evaluator {
     }
   }
 
-  public void setBot(Bot bot) {
-    if (this.bot != null && bot != null) this.bot = bot;
-  }
+  //public void setBot(Bot bot) {
+  //  if (this.bot != null && bot != null) this.bot = bot;
+  //}
 
   public Bot getBot(){
     return bot;

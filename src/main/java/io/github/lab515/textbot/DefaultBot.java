@@ -74,7 +74,11 @@ public abstract class DefaultBot extends Bot implements BotMaker {
   }
 
   public String execute(String src, Map<String, String> args) throws Exception {
-    return tbot.execute(src, args, this);
+    return tbot.execute(src, args, null);
+  }
+
+  public String execute(String src, Map<String, String> args, Bot exBot) throws Exception {
+    return tbot.execute(src, args, exBot);
   }
 
   @Override
@@ -460,4 +464,6 @@ public abstract class DefaultBot extends Bot implements BotMaker {
       return -1;
     }
   }
+
+  public TextBot getTextBot(){return tbot;}
 }
