@@ -94,7 +94,7 @@ public class TextBot extends Evaluator {
 
   private void addExternalDefinition(String name, int val,
                                      Map<String, Integer> attrs, int threshold, Map<String, Integer> recheck) throws Exception {
-    if (driver != null) throw new Exception("Error: only for execution, not enabled with compiling change!");
+    if (bot != null) throw new Exception("Error: only for execution, not enabled with compiling change!");
     if (botCodes != null) throw new Exception("Error: textbot inited can not be modified!");
     if (name == null && name.length() < 1) throw new Exception("Error: empty text meta word!");
     name = name.toLowerCase();
@@ -112,7 +112,7 @@ public class TextBot extends Evaluator {
 
   private void addInternalDefinition(String name, int val,
                                      Map<String, Integer> attrs, int overwriteThreshold, Map<String, Integer> recheck) throws Exception {
-    if (driver != null) throw new Exception("Error: only for execution, not enabled with compiling change!");
+    if (bot != null) throw new Exception("Error: only for execution, not enabled with compiling change!");
     if (botCodes != null) throw new Exception("Error: textbot inited can not be modified!");
     if (name == null && name.length() < 1) throw new Exception("Error: empty name for add text meta word!");
     boolean hasNumbers = false;
@@ -144,7 +144,7 @@ public class TextBot extends Evaluator {
 
   private void removeDefinition(String name, Map<String, Integer> attrs,
                                 int limit) throws Exception {
-    if (driver != null) throw new Exception("Error: only for execution, not enabled with compiling change!");
+    if (bot != null) throw new Exception("Error: only for execution, not enabled with compiling change!");
     if (botCodes != null) throw new Exception("Error: textbot inited can not be modified!");
     if (name == null && name.length() < 1) throw new Exception("Error: empty meta word for remove!");
     name = name.toLowerCase();
@@ -177,8 +177,8 @@ public class TextBot extends Evaluator {
     return isValidName(name) && !internalVars.containsKey(name) && !supportedMetas.containsKey(name);
   }
 
-  private TextBot(Driver d) {
-    driver = d;
+  private TextBot(Bot d) {
+    bot = d;
   }
 
   private TextBot() {
@@ -215,7 +215,7 @@ public class TextBot extends Evaluator {
     supportedCommands.put("goto", TB_GOTO | TB_COMMAND_SYSTEM);
     supportedCommands.put("assert", TB_ASSERT | TB_COMMAND_SYSTEM);
     supportedActions = new LinkedHashMap<String, Integer>();
-    driver = null;
+    bot = null;
   }
 
   // binaries info
@@ -226,7 +226,7 @@ public class TextBot extends Evaluator {
 
 
   // runtime meta info, change as demanded
-  private Driver driver = null;
+  private Bot bot = null;
 
   // contextual info, restorable
   private Map<String, String> pageVars = null;
@@ -311,8 +311,8 @@ public class TextBot extends Evaluator {
           if (haveData) throw new Exception(getError("Error: page var can not be set ", code));
           data = cxt.currentPage;
         } else {
-          if (haveData) data = driver.setContextVar(stdName, data);
-          else data = driver.getContextVar(stdName);
+          if (haveData) data = bot.setContextVar(stdName, data);
+          else data = bot.getContextVar(stdName);
         }
       }
     } else if (supportedMetas.containsKey(stdName)) {
@@ -339,7 +339,7 @@ public class TextBot extends Evaluator {
         else if (haveData) vars.put(stdName, data);
         else data = vars.get(stdName);
       } else {
-        data = driver.getInstantVar(stdName);
+        data = bot.getInstantVar(stdName);
         if (flag == '?') data = data != null ? "true" : "false";
         else if (haveData) {
           throw new Exception(getError("Error: instant(external) var can not be set:" + stdName, code));
@@ -1365,7 +1365,7 @@ public class TextBot extends Evaluator {
     return new TextBot().initializeInternal(path, cmds, cmdFlags, cxtVars, actions, metas, keywords);
   }
 
-  public TextBot initializeInternal(String path, String[] cmds, int[] cmdFlags, String[] cxtVars, String[] actions, String[] metas, String[] keywords) throws Exception {
+  private TextBot initializeInternal(String path, String[] cmds, int[] cmdFlags, String[] cxtVars, String[] actions, String[] metas, String[] keywords) throws Exception {
     // start to compile the source code
     // read the stuff
     String source = FileUtils.readAllText(path, null);
@@ -1485,16 +1485,16 @@ public class TextBot extends Evaluator {
     return this;
   }
 
-  public TextBot simpleClone(Driver driver) {
-    if (botCodes == null || driver == null)
+  public TextBot simpleClone(Bot bot) {
+    if (botCodes == null || bot == null)
       return null;
-    TextBot ret = new TextBot(driver);
+    TextBot ret = new TextBot(bot);
     ret.botCodes = botCodes;
     ret.metaInfos = metaInfos;
     ret.descInfos = descInfos;
     ret.pageVars = new LinkedHashMap<String, String>();
     ret.loadedSourceFiles = loadedSourceFiles;
-    ret.driver = driver;
+    ret.bot = bot;
     //ret.lastError = null;
 
     // meta data copy is not necessary for now
@@ -1711,11 +1711,11 @@ public class TextBot extends Evaluator {
   }
 
   public String execute(String src, Map<String, String> startArgs,
-                        Driver driver) throws Exception {
+                        Bot bot) throws Exception {
     if (src == null || src.length() < 1) throw new Exception("Error: nothing to execute!");
     if (botCodes == null) throw new Exception("Error: textbot not initialized!");
-    if (driver == null) driver = this.driver;
-    if (driver == null) throw new Exception("Error: no driver specified, please specify a valid driver for execution!");
+    if (bot == null) bot = this.bot;
+    if (bot == null) throw new Exception("Error: no bot specified, please specify a valid bot for execution!");
 
     List<String> instLines = parseInLines(src);
     if (instLines.size() < 1) {
@@ -1821,7 +1821,7 @@ public class TextBot extends Evaluator {
           if (val == null) val = "";
           paras.put(key, val);
         }
-        driver.setMetaVars(paras); // do not couting on it
+        bot.setMetaVars(paras); // do not couting on it
         paras.clear();
 
       }
@@ -1979,10 +1979,10 @@ public class TextBot extends Evaluator {
           }
           try {
             if (!cxt.currentPage.equals(lastPage))
-              driver.navigating(lastPage, cxt.currentPage, getData((String) metaInfos.get("?" + cxt.currentPage),
+              bot.navigating(lastPage, cxt.currentPage, getData((String) metaInfos.get("?" + cxt.currentPage),
                       code, null, null), code.command);
-            if (pos == TB_INVOKE) val = driver.invokeAction(code.command, paras, val, cxt.currentPage, cxt.lastRet);
-            else val = driver.executeCommand(code.command, val, data, cxt.currentPage, cxt.lastRet);
+            if (pos == TB_INVOKE) val = bot.invokeAction(code.command, paras, val, cxt.currentPage, cxt.lastRet);
+            else val = bot.executeCommand(code.command, val, data, cxt.currentPage, cxt.lastRet);
           } catch (Exception e) {
             throw new Exception(getError("Error: " + e.getMessage() + " at "
                             + cxt.actionPage + "." + cxt.actionName,
@@ -2001,6 +2001,21 @@ public class TextBot extends Evaluator {
     botCodes = null;
     metaInfos = null;
     descInfos = null;
+    if(pageVars != null)pageVars.clear();
+    pageVars = null;
+    if(cacheData != null)cacheData.clear();
+    cacheData = null;
+    if(bot != null)bot.stop();
+    bot = null;
+  }
+
+  @Override
+  protected void accessMember(String varName, String var, String memberName, Oper out, Object uo) {
+    if(varName != null){
+      accessVariable(varName + "." + memberName,out,uo);
+    }else{
+      out.err = "not defined: " + (varName == null ? var : varName) + "." + memberName;
+    }
   }
 
   @Override
@@ -2031,15 +2046,19 @@ public class TextBot extends Evaluator {
       for (int i = 0; i < ps.length; i++) ps[i] = paras.get(i).Val;
     }
     try {
-      out.Val = driver.executeAPI(apiName, ps);
+      out.Val = bot.executeAPI(apiName, ps);
       if (out.Val == null) out.Val = "";
     } catch (Exception e) {
-      out.err = getError("Driver API Error: " + e.getMessage(), (Code) uo);
+      out.err = getError("Bot API Error: " + e.getMessage(), (Code) uo);
     }
   }
 
-  public void setDriver(Driver driver) {
-    if (this.driver != null && driver != null) this.driver = driver;
+  public void setBot(Bot bot) {
+    if (this.bot != null && bot != null) this.bot = bot;
+  }
+
+  public Bot getBot(){
+    return bot;
   }
 
 }

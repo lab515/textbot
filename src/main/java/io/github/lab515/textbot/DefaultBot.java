@@ -1,7 +1,4 @@
-package io.github.lab515.textbot.ext;
-
-import io.github.lab515.textbot.Driver;
-import io.github.lab515.textbot.TextBot;
+package io.github.lab515.textbot;
 
 
 import java.util.ArrayList;
@@ -10,79 +7,44 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public abstract class SomeBot implements Driver {
-  private static TextBot _textBot;
-  private static String _tpath;
-  private static Exception _error = null;
-
-  static synchronized void init(String path) throws Exception {
-    try {
-      _textBot = TextBot.initialize(path,
-              new String[]{"close", "shutdown", "switch", "sleep",
-                      "open", "alert", "prompt", "cookie",
-                      "eval", "match", "wait", "click",
-                      "click2", "type", "select", "text",
-                      "exists", "count", "value", "check"},
-              new int[]{TextBot.TB_COMMAND_PAGE, TextBot.TB_COMMAND_SYSTEM, TextBot.TB_COMMAND_SYSTEM, TextBot.TB_COMMAND_SYSTEM,
-                      TextBot.TB_COMMAND_PAGE, TextBot.TB_COMMAND_SYSTEM, TextBot.TB_COMMAND_SYSTEM, TextBot.TB_COMMAND_SYSTEM,
-                      TextBot.TB_COMMAND_SYSTEM, TextBot.TB_COMMAND_SYSTEM, TextBot.TB_COMMAND_PAGE},
-              new String[]{"url", "bodytext", "source", "title", "timeout"}, // context vars
-              new String[]{"exec"}, // actions
-              new String[]{}, null); // macros
-      _tpath = path;
-    } catch (Exception e) {
-      _error = e;
-    }
+public abstract class DefaultBot extends Bot implements BotMaker {
+  @Override
+  public String[] getCommands(){
+    return new String[]{"close", "shutdown", "switch", "sleep",
+            "open", "alert", "prompt", "cookie",
+            "eval", "match", "wait", "click",
+            "click2", "type", "select", "text",
+            "exists", "count", "value", "check"};
+  }
+  @Override
+  public int[] getCommandFlags(){
+    return new int[]{TextBot.TB_COMMAND_PAGE, TextBot.TB_COMMAND_SYSTEM, TextBot.TB_COMMAND_SYSTEM, TextBot.TB_COMMAND_SYSTEM,
+            TextBot.TB_COMMAND_PAGE, TextBot.TB_COMMAND_SYSTEM, TextBot.TB_COMMAND_SYSTEM, TextBot.TB_COMMAND_SYSTEM,
+            TextBot.TB_COMMAND_SYSTEM, TextBot.TB_COMMAND_SYSTEM, TextBot.TB_COMMAND_PAGE};
+  }
+  @Override
+  public String[] getContextVariables(){
+    return new String[]{"url", "bodytext", "source", "title", "timeout"};
+  }
+  @Override
+  public String[] getActions(){
+    return new String[]{"exec"};
+  }
+  @Override
+  public String[] getMetaVariables(){
+    return null;
+  }
+  @Override
+  public String[] getReservedKeywords(){
+    return null;
   }
 
   private Map<String, String> macs;
   private TextBot tbot = null;
   private boolean opened = true;
 
-  private static class TextBotHolder {
-    public TextBot tb = null;
-    public String id = null;
-
-    public TextBotHolder(String id, SomeBot bot) throws Exception {
-      tb = _textBot.simpleClone(bot);
-      this.id = id;
-    }
-
-    public boolean qualify(String id) {
-      return id == null || id.equals(this.id);
-    }
-  }
-
-  private static ThreadLocal<TextBotHolder> theBot = new ThreadLocal<TextBotHolder>();
-
-
-  public SomeBot() throws Exception {
-    this(true, true, null);
-  }
-
-  public SomeBot(String identifier) throws Exception {
-    this(true, true, identifier);
-  }
-
-  public SomeBot(boolean reuse, boolean restore, String identifier) throws Exception {
-    this(reuse, restore, identifier, null, false);
-  }
-
-  public SomeBot(boolean reuse, boolean restore, String identifier, String path, boolean force) throws Exception {
-    if (force || _tpath == null || !_tpath.equals(path)) {
-      init(path);
-    }
-    if (_error != null) throw _error;
-    macs = new LinkedHashMap<String, String>();
-    TextBotHolder tb = null;
-    if (!reuse || (tb = theBot.get()) == null || !tb.qualify(identifier)) tb = new TextBotHolder(identifier, this);
-    if (reuse) theBot.set(tb);
-    tb.tb.setRestoreScene(restore);
-    tbot = tb.tb;
-  }
-
-  public SomeBot(String identifier, String path, boolean force) throws Exception {
-    this(true, true, identifier, path, force);
+  public DefaultBot(String identifier, boolean reuse, boolean restore) throws Exception{
+    tbot = loadTextBotInst(reuse,restore,identifier,this,false);
   }
 
   public String findAction(String match, String cmtPrefix, String pkg) {
@@ -117,7 +79,8 @@ public abstract class SomeBot implements Driver {
 
   @Override
   public void setMetaVars(Map<String, String> macros) throws Exception {
-    macs.clear();
+    if(macs == null)macs = new LinkedHashMap<String,String>();
+    else macs.clear();
     for (String key : macros.keySet())
       macs.put(key, macros.get(key));
 
@@ -140,19 +103,18 @@ public abstract class SomeBot implements Driver {
 
   private String getPageUrl(String url) throws Exception {
     // first of all, get the rooter
-    if (url == null || url.length() < 1) {
-      url = currentUrl;
-      if (url == null || url.length() < 1) url = macs.get("root");
-    } else if (url.startsWith("/")) {
-      if (currentUrl == null || currentUrl.length() < 1 || currentUrl.startsWith("/")) url = macs.get("root") + url;
-      else {
-        // simply find the root
-        int p = currentUrl.indexOf('/', currentUrl.length() / 2);
-        if (p < 0) url = currentUrl + url;
-        else url = currentUrl.substring(0, p) + url;
+    if (url == null || url.length() < 1)url = currentPageUrl;
+    if(url != null && url.startsWith("/")) {
+      String root = null;
+      int p = currentPageUrl.indexOf(':');
+      if (currentPageUrl != null && !currentPageUrl.startsWith("/") && p > 0 && p < currentPageUrl.length() - 3) {
+        p = currentPageUrl.indexOf('/', p + 3);
+        if (p > 0) url = currentPageUrl.substring(0, p) + url;
+        else url = currentPageUrl + url;
+      } else {
+        url = macs.get("root") + url;
       }
-    }
-    if (url == null) url = "";
+    }else if(url == null || url.length() < 1)url = macs.get("root");
     return url;
   }
 
@@ -404,11 +366,11 @@ public abstract class SomeBot implements Driver {
 
   protected abstract String executeAPIExternal(String name, String[] ps, boolean actionMode) throws Exception;
 
-  private String currentUrl = null;
+  private String currentPageUrl = null;
 
   @Override
   public void navigating(String oldPage, String newPage, String url, String cmdOrAction) throws Exception {
-    currentUrl = url;
+    currentPageUrl = url;
     if (cmdOrAction.equals("open")) return;
     log("page change: from " + (oldPage != null && oldPage.length() > 0 ? oldPage : "n/a") + " to " + newPage);
     // let other bot handle the page switching.

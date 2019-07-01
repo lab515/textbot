@@ -365,7 +365,7 @@ public class Evaluator {
     s.put("kf_load", "4292321125");
     s.put("kf_time", "98638172556");
     //case.status < 0 || (case.status > 0 && passedDays(exec.qaautocand.rundate) >= 1) || (case.status = 0 && passedDays(exec.qaautocand.rundate) > 6)
-    System.out.println(c.evaluate(
-            " kf_messages * 1000 / (kf_time / 1000000) + \" messages/s\"", s, null));
+    System.out.println(c.evaluate("aa.aa",null));//
+            //" kf_messages * 1000 / (kf_time / 1000000) + \" messages/s\"", s, null));
   }
 }
