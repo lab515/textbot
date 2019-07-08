@@ -4,7 +4,7 @@
   <groupId>io.github.lab515</groupId>
   <artifactId>textbot</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.4</version>
+  <version>1.0.6</version>
   <name>textbot</name>
   <description>test automation interpretor layer</description>
   <url>https://github.com/lab515/textbot</url>

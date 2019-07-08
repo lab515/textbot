@@ -210,8 +210,8 @@ public abstract class DefaultBot extends Bot implements BotMaker {
             for (String ar : ret.split(";")) {
               ar = ar.trim();
               if (ar.startsWith(data)) {
-                data = null;
                 ret = ar.substring(data.length());
+                data = null;
                 break;
               }
             }

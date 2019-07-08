@@ -943,11 +943,12 @@ public class TextBot extends Evaluator {
               if (pos == TB_VAR) {
                 idx = item.indexOf(".");
                 if (idx >= 0) {
-                  if (!isValidName(item.substring(idx).trim()))
+                  if (!isValidName(item.substring(idx + 1).trim()))
                     throw new Exception("Error: invalid " + call + " target name: " + item + " in call " + call + lineInfo);
-                  if (!isValidPageName(item.substring(0, idx).trim().toLowerCase()))
+                  if (idx > 0 && !isValidPageName(item.substring(0, idx).trim().toLowerCase()))
                     throw new Exception("Error: invalid " + call + " target name: " + item + " in call " + call + lineInfo);
                   item = item.substring(0, idx).trim() + "." + item.substring(idx + 1).trim();
+                  if(item.startsWith("."))item = page + item; // in case it's default pointing to this
                 } else if (!isValidName(item))
                   throw new Exception("Error: invalid " + call + " target name: " + item + " in call " + lineInfo);
 
