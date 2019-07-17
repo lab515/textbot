@@ -162,7 +162,7 @@ public class Profiles {
         line = trimNormal(line.substring(0, pos)); // .trim() may remove the $# escapers
       }
       if (line.length() < 1 && (prefix != null && singlePrefix != null)) {
-        sb.append("\\n");
+        sb.append("\4");
       } else if (line.endsWith("\\")) {
         // fix: make sure not a translator
         int p = 1;
@@ -176,8 +176,6 @@ public class Profiles {
           }
         }
       }
-      if (line.length() < 1)
-        continue;
       if (prefix != null) {
         if (singlePrefix == null) {
           pos = line.indexOf('{');
@@ -219,7 +217,7 @@ public class Profiles {
         } else {
           if (singlePrefix != null) {
             sb.append(line);
-            sb.append("\\n");
+            sb.append("\4");
           } else {
             sb.append(prefix);
             sb.append(line);
@@ -352,17 +350,21 @@ public class Profiles {
     vars.put("cxt.hours", Integer.toString(calendar.get(Calendar.HOUR_OF_DAY)));
     vars.put("cxt.minutes", Integer.toString(calendar.get(Calendar.MINUTE)));
     vars.put("cxt.seconds", Integer.toString(calendar.get(Calendar.SECOND)));
-
+    //FIX: add overwritten proerties before init as well
+    if (_ovProps != null) {
+      if(p1 == null)p1 = new Properties();
+      copyProps(_ovProps, p1, true);
+    }
     p1 = loadProfileInternal(name, null, conf, p1, vars, tracks);
-    // ok, handle the variable, mapping
-    String key = null;
-    String val = null;
+
     // Add: overwriteen props
     if (_ovProps != null) {
       //p1.putAll(_ovProps);
       copyProps(_ovProps, p1, true);
     }
-
+    // ok, handle the variable, mapping
+    String key = null;
+    String val = null;
     // ADD: deferred processing, include removing
     LinkedList<String> allList = new LinkedList<String>();
     for (Object s : p1.keySet()) {

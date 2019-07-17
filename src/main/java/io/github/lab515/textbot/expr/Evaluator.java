@@ -228,11 +228,11 @@ public class Evaluator {
             case OP.TOKEN_JMPT:
               if (p.Flag == OP.TOKEN_JMP || (getBoolean(v1.Val) != (p.Flag == OP.TOKEN_JMPF))) {
                 v3 = Integer.parseInt(p.Flag == OP.TOKEN_JMP ? p.TkValue : v2.Val);
+                if(p.Flag != OP.TOKEN_JMP)v2 = v1;
                 while (v3-- > 0)
                   p = p._next;
-              }
-              //if(p.Flag == OP.TOKEN_JMP)
-              v2 = v1; // jump won't cause problem
+              }else //if(p.Flag == OP.TOKEN_JMP)
+                v2 = v1; // jump won't cause problem
               break;
             case OP.TOKEN_MUL:
               v2.Val = getNumber(v1.Val) * getNumber(v2.Val) + "";
