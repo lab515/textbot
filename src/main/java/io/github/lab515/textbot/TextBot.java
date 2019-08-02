@@ -2050,7 +2050,12 @@ public class TextBot extends Evaluator {
       out.Val = bot.executeAPI(apiName, ps);
       if (out.Val == null) out.Val = "";
     } catch (Exception e) {
-      out.err = getError("Bot API Error: " + e.getMessage(), (Code) uo);
+      StackTraceElement[] eles = e.getStackTrace();
+      StackTraceElement[] parEles = e.getCause() != null ? e.getCause().getStackTrace() : null;
+      out.err = getError("Bot API Error: " +
+              (e.getMessage() != null ? e.getMessage() : e.getClass().getName()) +
+              (eles != null ? "/" + eles[0].toString() : "") +
+              (parEles != null ? "/" + parEles[0].toString() : ""), (Code) uo);
     }
   }
 
