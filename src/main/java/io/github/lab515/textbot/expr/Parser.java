@@ -225,7 +225,9 @@ class Parser {
     if (a.err != null) {
       return setErr(a.err);
     }
-    return parseExpr(a, -1, 2);
+    OP ret = parseExpr(a, -1, 2);
+    if(getErr() == null && a.hasNext())ret = setErr("unexpected tokens: " + a.nextOp().TkValue);
+    return ret;
   }
 
   public static String compileStdExpr(String constSouce) {
